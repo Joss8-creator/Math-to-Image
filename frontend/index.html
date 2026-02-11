@@ -1,0 +1,455 @@
+<!-- frontend/index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Arte Matemático</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #00ff88;
+            font-size: 1.8em;
+            letter-spacing: 2px;
+        }
+        
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .mode-btn {
+            padding: 12px 24px;
+            background: #1a1a1a;
+            border: 2px solid #333;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        .mode-btn.active {
+            background: #00ff88;
+            color: #0a0a0a;
+            border-color: #00ff88;
+        }
+        
+        .mode-content {
+            display: none;
+        }
+        
+        .mode-content.active {
+            display: block;
+        }
+        
+        .formula-mode {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .input-section, .output-section {
+            background: #1a1a1a;
+            padding: 20px;
+            border: 1px solid #333;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #00ff88;
+            font-size: 0.9em;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            color: #e0e0e0;
+            font-family: inherit;
+            margin-bottom: 15px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: #00ff88;
+            border: none;
+            color: #0a0a0a;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        button:hover {
+            background: #00dd77;
+        }
+        
+        canvas {
+            border: 1px solid #333;
+            display: block;
+            margin: 15px auto;
+            background: white;
+        }
+        
+        .metadata {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+        
+        .error {
+            background: #ff3333;
+            color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .formula-display {
+            background: #0a0a0a;
+            padding: 15px;
+            border: 1px solid #333;
+            margin: 15px 0;
+            font-family: 'Times New Roman', serif;
+            color: #00ff88;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⟨ SISTEMA DE ARTE MATEMÁTICO ⟩</h1>
+        
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="switchMode('formula')">
+                FÓRMULA → IMAGEN
+            </button>
+            <button class="mode-btn" onclick="switchMode('image')">
+                IMAGEN → FÓRMULA
+            </button>
+        </div>
+        
+        <!-- MODO: Fórmula → Imagen -->
+        <div id="formula-mode" class="mode-content active">
+            <div class="formula-mode">
+                <div class="input-section">
+                    <h2>Entrada</h2>
+                    
+                    <label>x(t) =</label>
+                    <input type="text" id="formula-x" 
+                           value="cos(5*t) * cos(t)"
+                           placeholder="ej: cos(5*t) * cos(t)">
+                    
+                    <label>y(t) =</label>
+                    <input type="text" id="formula-y" 
+                           value="cos(5*t) * sin(t)"
+                           placeholder="ej: cos(5*t) * sin(t)">
+                    
+                    <label>Dominio t:</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <input type="number" id="t-min" value="0" step="0.01">
+                        <input type="number" id="t-max" value="6.28318" step="0.01">
+                    </div>
+                    
+                    <label>Resolución:</label>
+                    <input type="number" id="resolution" value="800" min="100" max="2048">
+                    
+                    <label>Puntos:</label>
+                    <input type="number" id="num-points" value="10000" min="100" max="100000">
+                    
+                    <button onclick="renderFormula()">RENDERIZAR</button>
+                    
+                    <div style="margin-top: 20px;">
+                        <button onclick="loadExample(0)" style="width: 100%; margin-bottom: 5px;">
+                            Ejemplo: Rosa 5 pétalos
+                        </button>
+                        <button onclick="loadExample(1)" style="width: 100%; margin-bottom: 5px;">
+                            Ejemplo: Espiral de Arquímedes
+                        </button>
+                        <button onclick="loadExample(2)" style="width: 100%;">
+                            Ejemplo: Lissajous 3:2
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="output-section">
+                    <h2>Resultado</h2>
+                    <canvas id="output-canvas" width="800" height="800"></canvas>
+                    
+                    <div id="formula-latex" class="formula-display"></div>
+                    <div id="metadata" class="metadata"></div>
+                    <div id="error-message" class="error" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MODO: Imagen → Fórmula -->
+        <div id="image-mode" class="mode-content">
+            <div class="formula-mode">
+                <div class="input-section">
+                    <h2>Entrada</h2>
+                    
+                    <label>Cargar Imagen:</label>
+                    <input type="file" id="image-upload" accept="image/*">
+                    
+                    <canvas id="input-canvas" width="400" height="400" 
+                            style="margin: 20px auto;"></canvas>
+                    
+                    <label>Términos de Fourier (max):</label>
+                    <input type="number" id="fourier-terms" value="10" min="3" max="50">
+                    
+                    <label>Iteraciones de optimización:</label>
+                    <input type="number" id="opt-iterations" value="500" min="100" max="5000">
+                    
+                    <button id="fit-btn" onclick="fitImage()">AJUSTAR FÓRMULA</button>
+                    
+                    <div class="metadata" style="margin-top: 20px;">
+                        <strong>⚠️ LIMITACIONES:</strong><br>
+                        • Solo contornos simples<br>
+                        • Una forma cerrada por imagen<br>
+                        • Borde bien definido<br>
+                        • NO funciona con fotos complejas
+                    </div>
+                </div>
+                
+                <div class="output-section">
+                    <h2>Fórmula Aproximada</h2>
+                    
+                    <canvas id="reconstructed-canvas" width="400" height="400"></canvas>
+                    
+                    <div id="fitted-formula" class="formula-display"></div>
+                    
+                    <div id="fit-metadata" class="metadata"></div>
+                    <div id="fit-error" class="error" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuración API
+        const API_BASE = 'http://localhost:8000/api';
+        
+        // Ejemplos precargados
+        const EXAMPLES = [
+            {
+                x: "cos(5*t) * cos(t)",
+                y: "cos(5*t) * sin(t)",
+                t_min: 0,
+                t_max: 6.28318
+            },
+            {
+                x: "t * cos(t)",
+                y: "t * sin(t)",
+                t_min: 0,
+                t_max: 12.56637
+            },
+            {
+                x: "sin(3*t)",
+                y: "sin(2*t)",
+                t_min: 0,
+                t_max: 6.28318
+            }
+        ];
+        
+        function switchMode(mode) {
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.mode-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            document.getElementById(`${mode}-mode`).classList.add('active');
+        }
+        
+        function loadExample(index) {
+            const example = EXAMPLES[index];
+            document.getElementById('formula-x').value = example.x;
+            document.getElementById('formula-y').value = example.y;
+            document.getElementById('t-min').value = example.t_min;
+            document.getElementById('t-max').value = example.t_max;
+        }
+        
+        async function renderFormula() {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE}/render`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        x_formula: document.getElementById('formula-x').value,
+                        y_formula: document.getElementById('formula-y').value,
+                        t_min: parseFloat(document.getElementById('t-min').value),
+                        t_max: parseFloat(document.getElementById('t-max').value),
+                        resolution: parseInt(document.getElementById('resolution').value),
+                        num_points: parseInt(document.getElementById('num-points').value),
+                        color: [0, 0, 0]
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Error desconocido');
+                }
+                
+                const result = await response.json();
+                
+                // Mostrar imagen
+                const canvas = document.getElementById('output-canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                };
+                img.src = 'data:image/png;base64,' + result.image_base64;
+                
+                // Mostrar fórmula LaTeX (simplificado)
+                document.getElementById('formula-latex').textContent = 
+                    result.formula_latex.replace(/\\\\/g, '\n');
+                
+                // Metadatos
+                const meta = result.metadata;
+                document.getElementById('metadata').innerHTML = `
+                    <strong>Metadatos:</strong><br>
+                    Puntos renderizados: ${meta.points_rendered}<br>
+                    Resolución: ${meta.resolution}<br>
+                    Dominio: ${meta.domain}
+                `;
+                
+            } catch (error) {
+                errorDiv.textContent = `Error: ${error.message}`;
+                errorDiv.style.display = 'block';
+            }
+        }
+        
+        // Manejo de carga de imagen
+        document.getElementById('image-upload')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.getElementById('input-canvas');
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Ajustar a canvas manteniendo aspecto
+                    const scale = Math.min(
+                        canvas.width / img.width,
+                        canvas.height / img.height
+                    );
+                    const x = (canvas.width - img.width * scale) / 2;
+                    const y = (canvas.height - img.height * scale) / 2;
+                    
+                    ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        async function fitImage() {
+            const errorDiv = document.getElementById('fit-error');
+            const fitBtn = document.getElementById('fit-btn');
+            errorDiv.style.display = 'none';
+            
+            const fileInput = document.getElementById('image-upload');
+            if (!fileInput.files[0]) {
+                alert('Por favor selecciona una imagen primero.');
+                return;
+            }
+
+            fitBtn.disabled = true;
+            fitBtn.textContent = 'PROCESANDO...';
+
+            try {
+                // Leer imagen como base64
+                const file = fileInput.files[0];
+                const base64 = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+                    reader.readAsDataURL(file);
+                });
+
+                const response = await fetch(`${API_BASE}/fit`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        image_base64: base64,
+                        num_terms: parseInt(document.getElementById('fourier-terms').value),
+                        iterations: parseInt(document.getElementById('opt-iterations').value)
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Error en el ajuste');
+                }
+
+                const result = await response.json();
+
+                // Mostrar reconstrucción
+                const canvas = document.getElementById('reconstructed-canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                };
+                img.src = 'data:image/png;base64,' + result.image_base64;
+
+                // Mostrar fórmula
+                document.getElementById('fitted-formula').textContent = result.formula_latex.replace(/\\\\/g, '\n');
+
+                // Metadatos
+                document.getElementById('fit-metadata').innerHTML = `
+                    <strong>Metadatos:</strong><br>
+                    Error L2: ${result.metadata.error.toFixed(4)}<br>
+                    Términos: ${document.getElementById('fourier-terms').value}<br>
+                    Dominio: t ∈ [0, 2π]
+                `;
+
+            } catch (error) {
+                errorDiv.textContent = `Error: ${error.message}`;
+                errorDiv.style.display = 'block';
+            } finally {
+                fitBtn.disabled = false;
+                fitBtn.textContent = 'AJUSTAR FÓRMULA';
+            }
+        }
+    </script>
+</body>
+</html>

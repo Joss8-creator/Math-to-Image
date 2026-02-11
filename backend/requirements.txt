@@ -1,0 +1,28 @@
+# Dependencias del proyecto con versiones específicas
+
+# Core científico
+numpy
+scipy
+sympy==1.12
+
+# Procesamiento de imágenes
+scikit-image
+Pillow>=12.0.0
+
+# API
+fastapi
+uvicorn[standard]==0.23.0
+pydantic
+
+# Testing
+pytest==7.4.0
+pytest-cov==4.1.0
+
+# Benchmarking
+matplotlib==3.7.2
+
+# Opcional: GPU (descomentar si tienes NVIDIA GPU)
+# cupy-cuda11x==12.2.0  # Cambiar versión CUDA según tu sistema
+
+# Opcional: Optimización avanzada
+# numba==0.57.1  # JIT compilation

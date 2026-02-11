@@ -1,0 +1,32 @@
+# Archivos de entorno virtual
+venv/
+.venv/
+env/
+.env/
+
+# Python caching
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDEs y Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Resultados de tests y benchmarks
+htmlcov/
+.pytest_cache/
+.coverage
+*.png
+*.jpg
+*.jpeg
+!frontend/assets/ # Mantener assets si los hubiera, pero ignorar outputs generados
+
+# Logs
+*.log

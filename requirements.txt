@@ -1,0 +1,2 @@
+# Este archivo referencia las dependencias del backend para facilitar la instalación global.
+-r backend/requirements.txt
