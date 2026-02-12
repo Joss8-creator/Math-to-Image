@@ -48,6 +48,36 @@ cd backend
 bash run_all_tests.sh
 ```
 
+### Despliegue
+
+El proyecto se puede desplegar en cualquier servidor web que soporte Python y FastAPI.
+
+Para desplegar el proyecto en Render.com, sigue los siguientes pasos:
+
+1. Crea una cuenta en Render.com si no tienes una.
+2. Clona el repositorio en tu computadora.
+3. Ve al panel de control de Render.com y selecciona "New" -> "Web Service".
+4. En la configuración, selecciona "GitHub" como fuente de código.
+5. Selecciona el repositorio que clonaste.
+6. Configura el entorno de despliegue:
+   - Lenguaje: Python
+   - Rama: main
+   - Comando de despliegue: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+7. Guarda y despliega.
+
+## 🌐 Demo en Producción
+
+- 🖼️ Frontend:
+  https://math-to-image-frontend.onrender.com
+
+## 📚 Documentación
+
+- 📝 API (Swagger):
+  https://math-to-image.onrender.com/docs
+
+- 📚 Documentación de la API:
+  https://math-to-image.onrender.com/docs
+
 ## Licencia
 
 Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
