@@ -252,7 +252,10 @@
     
     <script>
         // Configuración API
-        const API_BASE = 'http://localhost:8000/api';
+        const API_BASE =
+            window.location.hostname === "localhost"
+                ? "http://127.0.0.1:8000/api"
+                : "https://math-to-image.onrender.com/api";
         
         // Ejemplos precargados
         const EXAMPLES = [
